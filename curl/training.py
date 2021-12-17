@@ -413,7 +413,7 @@ def setup_dynamic_ops(n_y):
   sigma_update_op = tf.scatter_nd_update(latent_prior_sigma_w, sigma_indices,
                                          sigma_updates)
 
-  dynamic_ops = {
+  return {
       'ind_from_ph': ind_from,
       'ind_to_ph': ind_to,
       'latent_enc_tensors': latent_enc_tensors,
@@ -424,8 +424,6 @@ def setup_dynamic_ops(n_y):
       'mu_update_op': mu_update_op,
       'sigma_update_op': sigma_update_op
   }
-
-  return dynamic_ops
 
 
 def copy_component_params(ind_from, ind_to, sess, ind_from_ph, ind_to_ph,

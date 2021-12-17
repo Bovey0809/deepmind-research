@@ -46,10 +46,7 @@ class NF_ResNet(hk.Module):
     self.width_pattern = [item * self.width for item in [64, 128, 256, 512]]
     self.depth_pattern = block_params['depth']
     self.activation = base.nonlinearities[activation]
-    if drop_rate is None:
-      self.drop_rate = block_params['drop_rate']
-    else:
-      self.drop_rate = drop_rate
+    self.drop_rate = block_params['drop_rate'] if drop_rate is None else drop_rate
     self.which_conv = base.WSConv2D
     # Stem
     ch = int(16 * self.width)

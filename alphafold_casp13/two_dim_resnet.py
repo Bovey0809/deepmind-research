@@ -163,7 +163,7 @@ def make_two_dim_resnet(
     if i_layer == num_layers - 1:
       out_channels = num_predictions
       non_linearity = final_non_linearity
-    if i_layer == 0 or i_layer == num_layers - 1:
+    if i_layer in [0, num_layers - 1]:
       layer_name = name_prefix + 'conv%d' % (i_layer + 1)
       initial_filter_size = filter_size
       if resize_features_with_1x1:
@@ -197,6 +197,4 @@ def make_two_dim_resnet(
           stddev=stddev,
           dropout_keep_prob=dropout_keep_prob)
 
-  y = previous_layer
-
-  return y
+  return previous_layer

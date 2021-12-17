@@ -367,7 +367,7 @@ class ImagePreprocessor(hk.Module):
     pos_enc = self._positional_encoding_ctor(
         index_dims=index_dims)(batch_size=batch_size, pos=pos)
 
-    for i in range(0, self._n_extra_pos_mlp):
+    for i in range(self._n_extra_pos_mlp):
       pos_enc += hk.Linear(pos_enc.shape[-1])(pos_enc)
       if i < (self._n_extra_pos_mlp-1):
         pos_enc = jax.nn.relu(pos_enc)
@@ -495,7 +495,7 @@ class ImagePostprocessor(hk.Module):
           [inputs.shape[0]] + list(self._input_reshape_size)
           + [inputs.shape[-1]])
 
-    if self._postproc_type == 'conv' or self._postproc_type == 'raft':
+    if self._postproc_type in ['conv', 'raft']:
       # Convnet image featurization.
       conv = self.convnet
       if len(inputs.shape) == 5 and self._temporal_upsample == 1:
@@ -573,7 +573,7 @@ class AudioPreprocessor(hk.Module):
     pos_enc = self._positional_encoding_ctor(
         index_dims=index_dims)(batch_size=batch_size, pos=pos)
 
-    for i in range(0, self._n_extra_pos_mlp):
+    for i in range(self._n_extra_pos_mlp):
       pos_enc += hk.Linear(pos_enc.shape[-1])(pos_enc)
       if i < (self._n_extra_pos_mlp-1):
         pos_enc = jax.nn.relu(pos_enc)
@@ -764,10 +764,9 @@ class MultimodalPostprocessor(hk.Module):
       # Slice up modalities by their sizes.
       assert modality_sizes is not None
       inputs = restructure(modality_sizes=modality_sizes, inputs=inputs)
-    outputs = {modality: postprocessor(
+    return {modality: postprocessor(
         inputs[modality], is_training=is_training, pos=pos, modality_sizes=None)
                for modality, postprocessor in self._modalities.items()}
-    return outputs
 
 
 class ClassificationPostprocessor(hk.Module):
@@ -802,8 +801,7 @@ class ProjectionPostprocessor(hk.Module):
                is_training: bool,
                pos: Optional[jnp.ndarray] = None,
                modality_sizes: Optional[ModalitySizeT] = None) -> jnp.ndarray:
-    logits = hk.Linear(self._num_outputs)(inputs)
-    return logits
+    return hk.Linear(self._num_outputs)(inputs)
 
 
 class EmbeddingDecoder(hk.Module):

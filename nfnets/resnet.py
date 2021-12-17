@@ -150,10 +150,7 @@ class ResBlockV2(hk.Module):
   def __call__(self, x, is_training, test_local_stats):
     bn_args = (is_training, test_local_stats)
     out = self.activation(self.bn0(x, *bn_args))
-    if self.use_projection:
-      shortcut = self.conv_shortcut(out)
-    else:
-      shortcut = x
+    shortcut = self.conv_shortcut(out) if self.use_projection else x
     out = self.conv0(out)
     out = self.conv1(self.activation(self.bn1(out, *bn_args)))
     out = self.conv2(self.activation(self.bn2(out, *bn_args)))

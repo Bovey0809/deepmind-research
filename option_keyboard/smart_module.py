@@ -87,10 +87,9 @@ class SmartModuleExport(object):
 
     if inspect.ismethod(attr) or inspect.isfunction(attr):
       return self._create_captured_method(name)
-    else:
-      if all([isinstance(v, _ALLOWED_TYPES) for v in nest.flatten(attr)]):
-        self._captured_attrs[name] = attr
-      return attr
+    if all(isinstance(v, _ALLOWED_TYPES) for v in nest.flatten(attr)):
+      self._captured_attrs[name] = attr
+    return attr
 
   def __call__(self, *args, **kwargs):
     return self._create_captured_method("__call__")(*args, **kwargs)
@@ -201,16 +200,14 @@ class SmartModuleImport(object):
       flat_outputs = [v for _, v in sorted(flat_outputs.items())]
 
       output_spec = self._method_specs[method]["outputs"]
-      if output_spec is None:
-        if len(flat_outputs) != 1:
-          raise ValueError(
-              "Expected output containing a single tensor, found {}".format(
-                  flat_outputs))
-        outputs = flat_outputs[0]
-      else:
-        outputs = nest.unflatten_as(output_spec, flat_outputs)
+      if output_spec is not None:
+        return nest.unflatten_as(output_spec, flat_outputs)
 
-      return outputs
+      if len(flat_outputs) != 1:
+        raise ValueError(
+            "Expected output containing a single tensor, found {}".format(
+                flat_outputs))
+      return flat_outputs[0]
 
     return wrapped_method
 

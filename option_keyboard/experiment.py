@@ -86,9 +86,7 @@ def run_episode(environment, agent, is_training=False):
 
     timestep = new_timestep
 
-  episode_return = environment.episode_return
-
-  return episode_return
+  return environment.episode_return
 
 
 def write_returns_to_file(path, returns):

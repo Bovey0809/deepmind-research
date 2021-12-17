@@ -59,9 +59,8 @@ def sinusoid_position_encoding(
   inv_freq = max_timescale**(-freqs / hidden_size)
   pos_seq = np.arange(sequence_length - 1, -1, -1.0)
   sinusoid_inp = np.einsum("i,j->ij", pos_seq, inv_freq)
-  pos_emb = np.concatenate(
+  return np.concatenate(
       [np.sin(sinusoid_inp), np.cos(sinusoid_inp)], axis=-1)
-  return pos_emb
 
 
 class HierarchicalMemoryAttention(hk.Module):
@@ -108,8 +107,7 @@ class HierarchicalMemoryAttention(hk.Module):
         with_bias=False,
         w_init=hk.initializers.VarianceScaling(scale=self._init_scale),
         name=name)
-    out = linear(inputs)
-    return out
+    return linear(inputs)
 
   def __call__(
       self,
@@ -193,11 +191,10 @@ class HierarchicalMemoryAttention(hk.Module):
       def do_attention(sub_sub_inputs, sub_sub_top_k_contents):
         tiled_inputs = jnp.tile(sub_sub_inputs[None, None, :],
                                 reps=(self._k, 1, 1))
-        sub_attention_results = attention_layer(
+        return attention_layer(
             query=tiled_inputs,
             key=sub_sub_top_k_contents,
             value=sub_sub_top_k_contents)
-        return sub_attention_results
       do_attention = jax.vmap(do_attention, in_axes=0)
       attention_results = do_attention(sub_inputs, top_k_contents)
       attention_results = jnp.squeeze(attention_results, axis=2)

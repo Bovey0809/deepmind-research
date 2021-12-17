@@ -286,8 +286,7 @@ class Experiment(experiment.AbstractExperiment):
   ) -> np.ndarray:
     """Returns predictions for all the graphs in the dataset split."""
     model_out, _ = self.eval_apply(params, state, rng, **graph._asdict())
-    prediction = np.squeeze(model_out['globals'], axis=1)
-    return prediction
+    return np.squeeze(model_out['globals'], axis=1)
 
   def _get_predictions(
       self,

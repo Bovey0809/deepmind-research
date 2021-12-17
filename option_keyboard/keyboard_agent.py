@@ -215,9 +215,7 @@ class OptionValueNet(snt.AbstractModule):
     q_w = tf.tensordot(q_values, cumulant_weights, axes=[1, 0])  # [P,a]
     q_w_actions = tf.reduce_max(q_w, axis=0)
 
-    action = tf.cast(tf.argmax(q_w_actions), tf.int32)
-
-    return action
+    return tf.cast(tf.argmax(q_w_actions), tf.int32)
 
   @property
   def num_cumulants(self):

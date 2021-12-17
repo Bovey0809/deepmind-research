@@ -27,9 +27,9 @@ def get_config(num_epochs: int, batch_size: int):
   """Return config object, containing all hyperparameters for training."""
   train_images_per_epoch = dataset.Split.TRAIN_AND_VALID.num_examples
 
-  assert num_epochs in [40, 100, 300, 1000]
+  assert num_epochs in {40, 100, 300, 1000}
 
-  config = dict(
+  return dict(
       random_seed=0,
       num_classes=1000,
       batch_size=batch_size,
@@ -74,5 +74,3 @@ def get_config(num_epochs: int, batch_size: int):
           filename='pretrain.pkl'
       ),
   )
-
-  return config

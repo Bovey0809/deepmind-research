@@ -180,11 +180,10 @@ class DancerSprite(prefab_sprites.MazeWalker):
       if not self.dance_sequence:  # done!
         self.is_dancing = False
         the_plot["time_until_next_dance"] = the_plot["dance_delay"]
-    else:
-      if self.position == things[AGENT_CHAR].position:
-        # Award the player the appropriate amount of reward, and end episode.
-        the_plot.add_reward(self.value)
-        the_plot.terminate_episode()
+    elif self.position == things[AGENT_CHAR].position:
+      # Award the player the appropriate amount of reward, and end episode.
+      the_plot.add_reward(self.value)
+      the_plot.terminate_episode()
 
 
 class PlayerSprite(prefab_sprites.MazeWalker):

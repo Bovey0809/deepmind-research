@@ -39,8 +39,7 @@ def normalize_regression_loss(regression_loss, predictions):
   # 2) E_{x uniform, prediction uniform}[loss(x, prediction)] is as before.
   # Divides MSE regression loss by E[(prediction-x)^2]; assumes x=[-1,1]
   normalization = 2./3.
-  normalized_loss = regression_loss / ((1./3 + predictions**2) / normalization)
-  return normalized_loss
+  return regression_loss / ((1./3 + predictions**2) / normalization)
 
 
 def equal32(x, y):
@@ -84,8 +83,8 @@ def compute_loss_and_metrics(mu, log_sigma_sq,
                              mode='train'):
   """Computes loss statistics and other metrics."""
 
-  scalars_to_log = dict()
-  vectors_to_log = dict()
+  scalars_to_log = {}
+  vectors_to_log = {}
   scalars_to_log['regularization_loss'] = regularization_loss
   vectors_to_log['mu'] = mu
 

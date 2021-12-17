@@ -50,18 +50,13 @@ def _make_predicate_task(n_boxes, n_targets,
       wall_textures=wall,
       floor_textures=floor)
 
-  boxes = []
-  for _ in range(n_boxes):
-    boxes.append(
-        manipulation_props.BoxWithSites(mass=1.5, half_lengths=[0.5, 0.5, 0.5]))
-
-  targets = []
-  for _ in range(n_targets):
-    targets.append(
-        props.PositionDetector(
+  boxes = [
+      manipulation_props.BoxWithSites(mass=1.5, half_lengths=[0.5, 0.5, 0.5])
+      for _ in range(n_boxes)
+  ]
+  targets = [props.PositionDetector(
             pos=[0, 0, 0.5], size=[0.5, 0.5, 0.5], inverted=False,
-            visible=True))
-
+            visible=True) for _ in range(n_targets)]
   predicates = []
   if include_gtt_predicates:
     predicates.append(
@@ -88,9 +83,7 @@ def _make_predicate_task(n_boxes, n_targets,
       regenerate_predicates=False,
       physics_timestep=0.005,
       control_timestep=control_timestep)
-  env = composer.Environment(task=task, time_limit=time_limit)
-
-  return env
+  return composer.Environment(task=task, time_limit=time_limit)
 
 
 def go_to_k_targets(n_targets=3,

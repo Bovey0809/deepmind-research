@@ -178,9 +178,7 @@ class PredicateTask(composer.Task):
 
     # Egocentric target positions.
     def _target_callable(physics):
-      target_list = []
-      for target in self._targets:
-        target_list.append(target.site_pos(physics))
+      target_list = [target.site_pos(physics) for target in self._targets]
       return np.array(target_list)
 
     walker.observables.add_egocentric_vector(

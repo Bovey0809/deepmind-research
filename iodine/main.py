@@ -141,11 +141,7 @@ def get_session(chkp_dir, loss, stop_after_steps, save_summaries_steps,
 def load_checkpoint(use_placeholder=False, session=None):
   dataset = build("data")
   model = build("model")
-  if use_placeholder:
-    inputs = dataset.get_placeholders()
-  else:
-    inputs = dataset()
-
+  inputs = dataset.get_placeholders() if use_placeholder else dataset()
   info = model.eval(inputs)
   if session is None:
     session = tf.Session()

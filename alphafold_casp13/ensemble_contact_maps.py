@@ -92,8 +92,8 @@ def ensemble_one_distance_histogram(pickle_files, weights):
     dicts.append(distance_histogram_dict)
     assert dicts[-1]['probs'].shape[0] == dicts[-1]['probs'].shape[1], (
         '%d vs %d' % (dicts[-1]['probs'].shape[0], dicts[-1]['probs'].shape[1]))
-    assert (dicts[0]['probs'].shape[0:2] == dicts[-1]['probs'].shape[0:2]
-           ), ('%d vs %d' % (dicts[0]['probs'].shape, dicts[-1]['probs'].shape))
+    assert (dicts[0]['probs'].shape[:2] == dicts[-1]['probs'].shape[:2]
+            ), '%d vs %d' % (dicts[0]['probs'].shape, dicts[-1]['probs'].shape)
     if max_dim is None or max_dim < dicts[-1]['probs'].shape[2]:
       max_dim = dicts[-1]['probs'].shape[2]
   if len(dicts) != len(pickle_files):

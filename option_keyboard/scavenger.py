@@ -118,7 +118,7 @@ class Scavenger(auto_reset_environment.Base):
         self._walls.append(new_pos)
 
     # Objects.
-    self._objects = dict()
+    self._objects = {}
     for _ in range(self._num_init_objects):
       while True:
         new_pos = _random_pos(self._arena_size)

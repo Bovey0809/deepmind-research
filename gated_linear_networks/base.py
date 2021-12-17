@@ -202,10 +202,9 @@ class GatedLinearNetwork(LocalUpdateModule):
     context_dim = hyperplane_bias.shape[0]
     proj = jnp.dot(hyperplanes, side_info)
     bits = (proj > hyperplane_bias).astype(jnp.int32)
-    weight_index = jnp.sum(
+    return jnp.sum(
         bits *
         jnp.array([2**i for i in range(context_dim)])) if context_dim else 0
-    return weight_index
 
 
 class _GatedLinearLayer(LocalUpdateModule):
@@ -235,14 +234,12 @@ class _GatedLinearLayer(LocalUpdateModule):
 
   def _get_weights(self, input_size):
     """Get (or initialize) weight parameters."""
-    weights = hk.get_parameter(
+    return hk.get_parameter(
         "weights",
         shape=(self._output_size, 2**self._context_dim, input_size),
         dtype=self._dtype,
         init=self._init,
     )
-
-    return weights
 
   def _get_hyperplanes(self, side_info_size):
     """Get (or initialize) hyperplane weights and bias."""
@@ -274,10 +271,8 @@ class _GatedLinearLayer(LocalUpdateModule):
 
     # Perform layer-wise inference by mapping along output_size (num_neurons).
     layer_inference = _layer_vmap(self._inference_fn)
-    predictions = layer_inference(inputs, side_info, weights, hyperplanes,
+    return layer_inference(inputs, side_info, weights, hyperplanes,
                                   hyperplane_bias, *args, **kwargs)
-
-    return predictions
 
   def update(self, inputs: Array, side_info: Array, target: Array,
              learning_rate: float, *args,

@@ -76,10 +76,7 @@ CURRENT_STATE = 'meta/current_state/'
 def _is_same_state(state_1, state_2):
   if state_1.keys() != state_2.keys():
     return False
-  for k in state_1:
-    if not np.all(state_1[k] == state_2[k]):
-      return False
-  return True
+  return all(np.all(state_1[k] == state_2[k]) for k in state_1)
 
 
 def _singleton_or_none(iterable):
@@ -557,10 +554,9 @@ class PhasedBoxCarry(composer.Task):
         disallowed_contact = sorted((init_prop_geomid, init_pedestal_geomid))
         def has_disallowed_contact():
           physics.forward()
-          for contact in physics.data.contact:
-            if sorted((contact.geom1, contact.geom2)) == disallowed_contact:
-              return True
-          return False
+          return any(
+              sorted((contact.geom1, contact.geom2)) == disallowed_contact
+              for contact in physics.data.contact)
         while has_disallowed_contact():
           init_prop.shift_pose(physics, (0, 0, 0.001))
 

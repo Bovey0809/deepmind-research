@@ -42,11 +42,7 @@ class FileExporter(object):
   def _reshape(self, data):
     """Reshape given data into image format."""
     batch_size, height, width, n_channels = data.shape
-    if self._grid_height:
-      grid_height = self._grid_height
-    else:
-      grid_height = int(math.floor(math.sqrt(batch_size)))
-
+    grid_height = self._grid_height or int(math.floor(math.sqrt(batch_size)))
     grid_width = int(math.ceil(batch_size/grid_height))
 
     if n_channels == 1:

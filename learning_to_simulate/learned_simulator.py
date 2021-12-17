@@ -107,10 +107,8 @@ class LearnedSimulator(snt.AbstractModule):
 
     normalized_acceleration = self._graph_network(input_graphs_tuple)
 
-    next_position = self._decoder_postprocessor(
+    return self._decoder_postprocessor(
         normalized_acceleration, position_sequence)
-
-    return next_position
 
   def _encoder_preprocessor(
       self, position_sequence, n_node, global_context, particle_types):
@@ -201,8 +199,7 @@ class LearnedSimulator(snt.AbstractModule):
     most_recent_velocity = most_recent_position - position_sequence[:, -2]
 
     new_velocity = most_recent_velocity + acceleration  # * dt = 1
-    new_position = most_recent_position + new_velocity  # * dt = 1
-    return new_position
+    return most_recent_position + new_velocity
 
   def get_predicted_and_target_normalized_accelerations(
       self, next_position, position_sequence_noise, position_sequence,
@@ -256,9 +253,8 @@ class LearnedSimulator(snt.AbstractModule):
     acceleration = next_velocity - previous_velocity
 
     acceleration_stats = self._normalization_stats["acceleration"]
-    normalized_acceleration = (
+    return (
         acceleration - acceleration_stats.mean) / acceleration_stats.std
-    return normalized_acceleration
 
 
 def time_diff(input_sequence):

@@ -32,10 +32,7 @@ def autoencoder_aux(all_aux, all_params, x_in):
     h_out = common.fully_connected_layer(params, h_in + aux[1]) + aux[0]
     layers_values.append((h_out, h_in))
     # Last layer does not have a nonlinearity
-    if i % 4 != 3:
-      h_in = jnp.tanh(h_out)
-    else:
-      h_in = h_out
+    h_in = jnp.tanh(h_out) if i % 4 != 3 else h_out
   h1, _ = loss_functions.register_normal_predictive_distribution(h_in, x_in)
   h2, _ = loss_functions.register_normal_predictive_distribution(
       h_in, targets=x_in, weight=0.1)

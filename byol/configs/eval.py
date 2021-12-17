@@ -23,7 +23,7 @@ def get_config(checkpoint_to_evaluate: Text, batch_size: int):
   """Return config object for training."""
   train_images_per_epoch = dataset.Split.TRAIN_AND_VALID.num_examples
 
-  config = dict(
+  return dict(
       random_seed=0,
       enable_double_transpose=True,
       max_steps=80 * train_images_per_epoch // batch_size,
@@ -61,7 +61,5 @@ def get_config(checkpoint_to_evaluate: Text, batch_size: int):
           filename='linear-eval.pkl'
       ),
   )
-
-  return config
 
 

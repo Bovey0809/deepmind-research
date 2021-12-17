@@ -210,10 +210,9 @@ def build_forward_fn(train_data: pd.DataFrame, column_names: List[str],
 
       def log_prob_for_node(node):
         """Given a node, compute it's log probability for the given latents."""
-        log_prob = jnp.squeeze(
+        return jnp.squeeze(
             node.make_distribution(node_to_replacement).log_prob(
                 node.observed_value))
-        return log_prob
 
       # We apply the likelihood multiplier to all likelihood terms except that
       # for Y, the target. This is then added on separately in the line below.
@@ -404,10 +403,8 @@ def _evaluate(
     num_prediction_samples: int,
 ):
   """Perform evaluation of fair inference."""
-  output = fair_inference_fn(params, rng, inputs,
+  return fair_inference_fn(params, rng, inputs,
                              batch_size, num_prediction_samples)
-
-  return output
 
 
 def _loss_klqp(outputs: CausalNetOutput, beta: float) -> jnp.ndarray:
@@ -454,13 +451,12 @@ class Updater:
     """Initializes state of the updater."""
     params = self._net_init(init_rng, data)
     opt_state = self._opt.init(params)
-    out = dict(
+    return dict(
         step=np.array(0),
         rng=init_rng,
         opt_state=opt_state,
         params=params,
     )
-    return out
 
   @functools.partial(jax.jit, static_argnums=0)
   def update(self, state: Mapping[str, Any], data: jnp.ndarray):

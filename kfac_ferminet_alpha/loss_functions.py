@@ -70,10 +70,11 @@ class LossFunction(abc.ABC):
       coefficient_mode: str = "regular",
   ) -> jnp.ndarray:
     """Evaluate the loss function on the targets."""
-    if targets is None and self.targets is None:
-      raise ValueError("Cannot evaluate losses with unspecified targets.")
-    elif targets is None:
-      targets = self.targets
+    if targets is None:
+      if self.targets is None:
+        raise ValueError("Cannot evaluate losses with unspecified targets.")
+      else:
+        targets = self.targets
     if coefficient_mode == "regular":
       multiplier = self.weight
     elif coefficient_mode == "sqrt":

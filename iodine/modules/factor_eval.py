@@ -52,7 +52,7 @@ class FactorRegressor(snt.AbstractModule):
     num_visible_obj = tf.reduce_sum(visibility)
 
     # Map z to predictions for all latents
-    sg.M = sum([m.size for m in self._mapping])
+    sg.M = sum(m.size for m in self._mapping)
     self.predictor = snt.Linear(sg.M, name="predict_latents")
     z_flat = sg.reshape(z, "B*K, Z")
     all_preds = sg.guard(self.predictor(z_flat), "B*K, M")

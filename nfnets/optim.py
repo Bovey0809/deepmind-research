@@ -39,7 +39,7 @@ class Optimizer(object):
     # Join params at top-level if params is a list of groups
     if isinstance(params, list):
       flatmap = type(hk.data_structures.to_immutable_dict({}))
-      if any([isinstance(group['params'], flatmap) for group in params]):
+      if any(isinstance(group['params'], flatmap) for group in params):
         params = hk.data_structures.merge(*[group['params']
                                             for group in params])
       else:
@@ -431,8 +431,7 @@ class Fromage(Optimizer):
 
 def compute_norm(x, axis, keepdims):
   """Returns norm over arbitrary axis."""
-  norm = jnp.sum(x ** 2, axis=axis, keepdims=keepdims) ** 0.5
-  return norm
+  return jnp.sum(x ** 2, axis=axis, keepdims=keepdims) ** 0.5
 
 
 def unitwise_norm(x):
@@ -505,7 +504,7 @@ class Hybrid(Optimizer):
   """
 
   def __init__(self, param_groups):
-    if any(['opt' not in group for group in param_groups]):
+    if any('opt' not in group for group in param_groups):
       raise ValueError('All parameter groups must have an opt key!')
     self.defaults = ChainMap(*[group['opt'].defaults for group in param_groups])
     super().__init__(param_groups, defaults=dict(self.defaults))

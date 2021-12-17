@@ -107,8 +107,7 @@ def ensemble_predictions_by_probability_average(
 
 def get_accuracy_dict(predictions: Predictions) -> Dict[str, float]:
   """Returns the accuracy dict."""
-  output_dict = {}
-  output_dict['num_valid'] = predictions.predictions.shape[0]
+  output_dict = {'num_valid': predictions.predictions.shape[0]}
   matches = (predictions.labels == predictions.predictions)
   output_dict['accuracy'] = matches.mean()
 

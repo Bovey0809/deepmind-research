@@ -43,9 +43,7 @@ def generate_domains(target, sequence, crop_sizes, crop_step):
 
   windows = [int(x) for x in crop_sizes.split(",")]
   num_residues = len(sequence)
-  domains = []
-  domains.append({"name": target, "description": (1, num_residues)})
-
+  domains = [{"name": target, "description": (1, num_residues)}]
   for window in windows:
     starts = list(range(0, num_residues - window, crop_step))
     # Append a last crop to ensure we get all the way to the end of the
@@ -102,7 +100,7 @@ def paste_distance_histograms(
 
   targets = tf.io.gfile.glob(os.path.join(input_dir, "*.pickle"))
   targets = [os.path.splitext(os.path.basename(t))[0] for t in targets]
-  targets = set([t.split("-")[0] for t in targets])
+  targets = {t.split("-")[0] for t in targets}
   logging.info("Pasting distance histograms for %d targets", len(targets))
 
   for target in sorted(targets):
