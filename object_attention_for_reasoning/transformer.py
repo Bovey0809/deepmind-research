@@ -312,8 +312,7 @@ class MultiheadAttention(base.AbstractModule):
           shape=[input_size, self._num_heads * hidden_size],
           initializer=self._init['w'])
       w = tf.reshape(w, [input_size, self._num_heads, hidden_size])
-      out = tf.einsum('bij,jhk->bhik', inputs, w)
-      return out
+      return tf.einsum('bij,jhk->bhik', inputs, w)
 
   def _build(self,
              inputs,
@@ -605,11 +604,11 @@ class TransformerTower(base.AbstractModule):
       em_mem_size = max(_memory_size(s.episodic_memory) for s in state)
       memory_sizes = [cm_mem_size, em_mem_size]
     else:
-      memory_sizes = [max([_memory_size(s) for s in state])]
+      memory_sizes = [max(_memory_size(s) for s in state)]
     chunk_size = inputs.get_shape().as_list()[1]
     self._positional_encodings = []
     # Creates positional encodings for different memory types.
-    for i, memory_size in enumerate(memory_sizes):
+    for memory_size in memory_sizes:
       seq_len = chunk_size + memory_size
       key_positions = get_position_encodings(
           sequence_length=seq_len,

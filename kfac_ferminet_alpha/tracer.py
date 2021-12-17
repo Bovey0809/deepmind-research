@@ -59,7 +59,7 @@ def construct_compute_losses_inputs(
     primals_[params_index] = params_primals
     flat_args = jax.tree_flatten(primals_)[0]
     # Mapping from variable -> value
-    env = dict()
+    env = {}
     read = functools.partial(tgm.read_env, env)
     write = functools.partial(tgm.write_env, env)
 
@@ -225,7 +225,7 @@ def trace_estimator_vjp(tagged_func: _Function) -> _Function:
     def forward():
       own_func_args = func_args
       # Mapping from variable -> value
-      env = dict()
+      env = {}
       read = functools.partial(tgm.read_env, env)
       write = functools.partial(tgm.write_env, env)
 
@@ -307,7 +307,7 @@ def trace_estimator_vjp(tagged_func: _Function) -> _Function:
       layers_info = []
       for jaxpr_eqn in layer_tags:
         layer_tag = _unbox_layer_tag(jaxpr_eqn)
-        info = dict()
+        info = {}
         primals = jax_util.safe_map(read_primals, tuple(jaxpr_eqn.invars))
         (
             info["outputs"],

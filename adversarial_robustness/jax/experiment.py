@@ -374,8 +374,7 @@ class Experiment(experiment.AbstractExperiment):
         summed_scalars = scalars
       else:
         summed_scalars = jax.tree_multimap(jnp.add, summed_scalars, scalars)
-    mean_scalars = jax.tree_map(lambda x: x / num_samples, summed_scalars)
-    return mean_scalars
+    return jax.tree_map(lambda x: x / num_samples, summed_scalars)
 
   def _eval_fn(self, params, state, inputs, rng):
     images = inputs['image']
@@ -446,10 +445,7 @@ class Experiment(experiment.AbstractExperiment):
       init_rng = jl_utils.bcast_local_devices(rng)
       self._params, self._state = init_net(init_rng, images)
       # Setup weight averaging.
-      if self.config.training.swa_decay > 0:
-        self._avg_params = self._params
-      else:
-        self._avg_params = None
+      self._avg_params = self._params if self.config.training.swa_decay > 0 else None
       # Initialize optimizer state.
       init_opt = jax.pmap(self.optimizer.init, axis_name='i')
       self._opt_state = init_opt(self._params)

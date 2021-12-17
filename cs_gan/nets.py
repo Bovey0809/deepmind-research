@@ -76,8 +76,7 @@ class ConvMetricNet(snt.AbstractModule):
           paddings=[snt.SAME], activate_final=True,
           activation=functools.partial(tf.nn.leaky_relu, alpha=0.1))
       linear = snt.Linear(self._num_outputs)
-      output = linear(snt.BatchFlatten()(net(inputs)))
-      return output
+      return linear(snt.BatchFlatten()(net(inputs)))
     if self._use_sn:
       with tf.variable_scope('', custom_getter=_sn_custom_getter()):
         output = build_net()
@@ -111,5 +110,4 @@ class MLPMetricNet(snt.AbstractModule):
   def _build(self, inputs):
     net = snt.nets.MLP(self._layer_size,
                        activation=tf.nn.leaky_relu)
-    output = net(snt.BatchFlatten()(inputs))
-    return output
+    return net(snt.BatchFlatten()(inputs))

@@ -81,5 +81,4 @@ def maybe_center_crop(layer, target_hw):
   x_0, x_1 = border, l_height - border
   border = int((l_width - t_width) / 2)
   y_0, y_1 = border, l_width - border
-  layer_cropped = layer[:, x_0:x_1, y_0:y_1, :]
-  return layer_cropped
+  return layer[:, x_0:x_1, y_0:y_1, :]

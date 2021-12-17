@@ -136,9 +136,7 @@ def get_arrays(data_root="/data/",
 
   data_root = Path(data_root)
 
-  array_dict = {}
-  array_dict["paper_year"] = load_npy(data_root / RAW_NODE_YEAR_FILENAME)
-
+  array_dict = {'paper_year': load_npy(data_root / RAW_NODE_YEAR_FILENAME)}
   if k_fold_split_id is None:
     train_indices = load_npy(data_root / TRAIN_INDEX_FILENAME)
     valid_indices = load_npy(data_root / VALID_INDEX_FILENAME)

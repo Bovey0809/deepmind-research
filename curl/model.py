@@ -173,12 +173,11 @@ def data_decoder_fn(z,
     The Bernoulli distribution `p(x | z)`.
   """
 
-  if output_type == 'bernoulli':
-    output_dist = lambda x: tfp.distributions.Bernoulli(logits=x)
-    n_out_factor = 1
-    out_shape = list(output_shape)
-  else:
+  if output_type != 'bernoulli':
     raise NotImplementedError
+  output_dist = lambda x: tfp.distributions.Bernoulli(logits=x)
+  n_out_factor = 1
+  out_shape = list(output_shape)
   if len(z.shape) != 2:
     raise NotImplementedError('The data decoder function expects `z` to be '
                               '2D, but its shape was %s instead.' %
@@ -456,7 +455,7 @@ class Curl(object):
           logits=y_logits)
 
       # Reduce over all dimension except batch.
-      dims_x = [k for k in range(1, log_p_x.shape.ndims)]
+      dims_x = list(range(1, log_p_x.shape.ndims))
       log_p_x = reduce_op(log_p_x, dims_x, name='log_p_x')
       log_p_x_sup = reduce_op(log_p_x_sup, dims_x, name='log_p_x_sup')
 
@@ -505,15 +504,15 @@ class Curl(object):
       log_q_y = q.log_prob(y, name='log_q_y')
 
       # Reduce over all dimension except batch.
-      sum_axis_p = [k for k in range(1, log_p_y.get_shape().ndims)]
+      sum_axis_p = list(range(1, log_p_y.get_shape().ndims))
       log_p_y = tf.reduce_sum(log_p_y, sum_axis_p)
-      sum_axis_q = [k for k in range(1, log_q_y.get_shape().ndims)]
+      sum_axis_q = list(range(1, log_q_y.get_shape().ndims))
       log_q_y = tf.reduce_sum(log_q_y, sum_axis_q)
 
       kl = log_q_y - log_p_y
 
     # Reduce over all dimension except batch.
-    sum_axis_kl = [k for k in range(1, kl.get_shape().ndims)]
+    sum_axis_kl = list(range(1, kl.get_shape().ndims))
     kl = tf.reduce_sum(kl, sum_axis_kl, name='kl')
     return kl, q
 
@@ -546,15 +545,15 @@ class Curl(object):
       log_q_z = q.log_prob(z, name='log_q_z_xy')
 
       # Reduce over all dimension except batch.
-      sum_axis_p = [k for k in range(1, log_p_z.get_shape().ndims)]
+      sum_axis_p = list(range(1, log_p_z.get_shape().ndims))
       log_p_z = tf.reduce_sum(log_p_z, sum_axis_p)
-      sum_axis_q = [k for k in range(1, log_q_z.get_shape().ndims)]
+      sum_axis_q = list(range(1, log_q_z.get_shape().ndims))
       log_q_z = tf.reduce_sum(log_q_z, sum_axis_q)
 
       kl = log_q_z - log_p_z
 
     # Reduce over all dimension except batch.
-    sum_axis_kl = [k for k in range(1, kl.get_shape().ndims)]
+    sum_axis_kl = list(range(1, kl.get_shape().ndims))
     kl = tf.reduce_sum(kl, sum_axis_kl, name='kl')
     return kl, z
 
@@ -575,21 +574,20 @@ class Curl(object):
       if y is None:
         y = tf.to_float(self.infer_cluster(hiddens).mode())
 
-    if use_mean_y:
-      # If use_mean_y, then y must be probabilities
-      all_y = tf.tile(
-          tf.expand_dims(tf.one_hot(tf.range(y.shape[1]), y.shape[1]), axis=1),
-          multiples=[1, y.shape[0], 1])
-
-      # Compute z KL from x (for all possible y), and keep z's around
-      z_all = tf.map_fn(
-          fn=lambda y: self._latent_encoder(
-              hiddens, y, is_training=self._is_training).mean(),
-          elems=all_y,
-          dtype=tf.float32)
-      return tf.einsum('ij,jik->ik', y, z_all)
-    else:
+    if not use_mean_y:
       return self._latent_encoder(hiddens, y, is_training=self._is_training)
+    # If use_mean_y, then y must be probabilities
+    all_y = tf.tile(
+        tf.expand_dims(tf.one_hot(tf.range(y.shape[1]), y.shape[1]), axis=1),
+        multiples=[1, y.shape[0], 1])
+
+    # Compute z KL from x (for all possible y), and keep z's around
+    z_all = tf.map_fn(
+        fn=lambda y: self._latent_encoder(
+            hiddens, y, is_training=self._is_training).mean(),
+        elems=all_y,
+        dtype=tf.float32)
+    return tf.einsum('ij,jik->ik', y, z_all)
 
   def generate_latent(self, y):
     """Use the generative model to compute latent variable z, given a y.

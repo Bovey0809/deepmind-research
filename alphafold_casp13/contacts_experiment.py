@@ -209,8 +209,7 @@ class Contacts(object):
         'sequences': self._input_batch.sequences,
     }
     if hasattr(self._input_batch.targets, 'residue_index'):
-      request_dict.update(
-          {'residue_index': self._input_batch.targets.residue_index})
+      request_dict['residue_index'] = self._input_batch.targets.residue_index
     if hasattr(self._input_batch.targets, 'phi_angles'):
       request_dict.update(
           {'phi_angles': self._input_batch.targets.phi_angles,
@@ -229,5 +228,4 @@ class Contacts(object):
       request_dict.update(
           {'alpha_positions': self._input_batch.targets.alpha_positions,
            'alpha_mask': self._input_batch.targets.alpha_mask,})
-    batch = sess.run(request_dict)
-    return batch
+    return sess.run(request_dict)

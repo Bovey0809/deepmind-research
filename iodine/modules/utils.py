@@ -78,8 +78,7 @@ def get_mask_plot_colors(nr_colors):
   """Get nr_colors uniformly spaced hues to plot mask values."""
   hsv_colors = np.ones((nr_colors, 3), dtype=np.float32)
   hsv_colors[:, 0] = np.linspace(0, 1, nr_colors, endpoint=False)
-  color_conv = hsv_to_rgb(hsv_colors)
-  return color_conv
+  return hsv_to_rgb(hsv_colors)
 
 
 def color_transform(masks):
@@ -494,9 +493,8 @@ def build(plan, identifier):
 
 def _resolve_constructor(plan_subsection):
   assert "constructor" in plan_subsection, plan_subsection
-  if isinstance(plan_subsection["constructor"], str):
-    module, _, ctor = plan_subsection["constructor"].rpartition(".")
-    mod = importlib.import_module(module)
-    return getattr(mod, ctor)
-  else:
+  if not isinstance(plan_subsection["constructor"], str):
     return plan_subsection["constructor"]
+  module, _, ctor = plan_subsection["constructor"].rpartition(".")
+  mod = importlib.import_module(module)
+  return getattr(mod, ctor)

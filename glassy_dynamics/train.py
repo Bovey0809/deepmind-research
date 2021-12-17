@@ -143,8 +143,7 @@ def get_minimize_op(
   if grad_clip:
     grads, _ = tf.clip_by_global_norm([g for g, _ in grads_and_vars], grad_clip)
     grads_and_vars = [(g, pair[1]) for g, pair in zip(grads, grads_and_vars)]
-  minimize = optimizer.apply_gradients(grads_and_vars)
-  return minimize
+  return optimizer.apply_gradients(grads_and_vars)
 
 
 def _log_stats_and_return_mean_correlation(

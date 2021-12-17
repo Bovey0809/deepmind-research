@@ -158,12 +158,12 @@ def get_regression_label(dataset_row, task_type):
   """Returns time-until-merger regression target given desired modeling task."""
   if task_type == losses.TASK_NORMALIZED_REGRESSION:
     return tf.dtypes.cast(dataset_row['normalized_time'], tf.float32)
-  elif task_type == losses.TASK_GROUNDED_UNNORMALIZED_REGRESSION:
+  elif (task_type == losses.TASK_GROUNDED_UNNORMALIZED_REGRESSION
+        or task_type != losses.TASK_UNNORMALIZED_REGRESSION
+        and task_type == losses.TASK_CLASSIFICATION):
     return tf.dtypes.cast(dataset_row['grounded_normalized_time'], tf.float32)
   elif task_type == losses.TASK_UNNORMALIZED_REGRESSION:
     return tf.dtypes.cast(dataset_row['unnormalized_time'], tf.float32)
-  elif task_type == losses.TASK_CLASSIFICATION:
-    return tf.dtypes.cast(dataset_row['grounded_normalized_time'], tf.float32)
   else:
     raise ValueError
 
@@ -211,7 +211,7 @@ def prepare_dataset(ds, target_size, crop_type, n_repeats, augmentations,
         image = image[
             crop_loc[0]:crop_loc[0] + crop_size[0],
             crop_loc[1]:crop_loc[1] + crop_size[1], :]
-        image = tf.image.resize(image, target_size[0:2])
+        image = tf.image.resize(image, target_size[:2])
         image.set_shape([target_size[0], target_size[1], target_size[2]])
 
       elif crop_type == CROP_TYPE_RANDOM:
@@ -257,9 +257,9 @@ def prepare_dataset(ds, target_size, crop_type, n_repeats, augmentations,
                  ', '.join(additional_features))
 
     def _prepare_additional_features(dataset_row):
-      features = []
-      for f in additional_features:
-        features.append(normalize_physical_feature(f, dataset_row))
+      features = [
+          normalize_physical_feature(f, dataset_row) for f in additional_features
+      ]
       features = tf.convert_to_tensor(features, dtype=tf.float32)
       features.set_shape([len(additional_features)])
       return features

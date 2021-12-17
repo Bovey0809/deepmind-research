@@ -235,8 +235,7 @@ def cluster_subspaces(omega):
   d, v = np.linalg.eig(lapl)
   # connected components of graph
   cliques = np.abs(v[:, np.abs(d) < 1e-6]) > 1e-6
-  tangents = [w[cliques[:, i]] for i in range(sum(np.abs(d) < 1e-6))]
-  return tangents
+  return [w[cliques[:, i]] for i in range(sum(np.abs(d) < 1e-6))]
 
 
 def fit(data, k, gamma=None, nnbrs=None, neig=10, shard_size=1000):

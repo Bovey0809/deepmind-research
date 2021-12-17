@@ -215,7 +215,7 @@ class Sequential(snt.Module):
 
   def __call__(self, inputs: tf.Tensor, is_training: bool, **kwargs):
     outputs = inputs
-    for _, mod in enumerate(self._layers):
+    for mod in self._layers:
       if accepts_is_training(mod):
         outputs = mod(outputs, is_training=is_training, **kwargs)
       else:

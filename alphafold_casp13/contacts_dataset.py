@@ -101,8 +101,7 @@ def shape(feature_name, num_residues, features=None):
   unused_dtype, raw_sizes = features[feature_name]
   replacements = {NUM_RES: num_residues}
 
-  sizes = [replacements.get(dimension, dimension) for dimension in raw_sizes]
-  return sizes
+  return [replacements.get(dimension, dimension) for dimension in raw_sizes]
 
 
 def dim(feature_name):
@@ -300,18 +299,17 @@ def convert_to_legacy_proteins_dataset_format(
     if feature_dim == FeatureType.ONE_DIM:
       tensors_1d.append(tf.cast(features[key], dtype=tf.float32))
     elif feature_dim == FeatureType.TWO_DIM:
-      if key not in features:
-        if not(key + '_cropped' in features and key + '_diagonal' in features):
-          raise ValueError(
-              'The 2D feature %s is not in the features dictionary and neither '
-              'are its cropped and diagonal versions.' % key)
-        else:
-          tensors_2d.append(
-              tf.cast(features[key + '_cropped'], dtype=tf.float32))
-          tensors_2d_diagonal.append(
-              tf.cast(features[key + '_diagonal'], dtype=tf.float32))
-      else:
+      if key in features:
         tensors_2d.append(tf.cast(features[key], dtype=tf.float32))
+      elif key + '_cropped' not in features or key + '_diagonal' not in features:
+        raise ValueError(
+            'The 2D feature %s is not in the features dictionary and neither '
+            'are its cropped and diagonal versions.' % key)
+      else:
+        tensors_2d.append(
+            tf.cast(features[key + '_cropped'], dtype=tf.float32))
+        tensors_2d_diagonal.append(
+            tf.cast(features[key + '_diagonal'], dtype=tf.float32))
     else:
       raise ValueError('Unexpected FeatureType returned: %s' % str(feature_dim))
 
@@ -341,14 +339,14 @@ def convert_to_legacy_proteins_dataset_format(
   else:
     crops = tf.stack([0, tf.shape(sequence)[0], 0, tf.shape(sequence)[0]])
 
-  scalar_tensors = []
-  for key in desired_scalars:
-    scalar_tensors.append(features.get(key + '_unnormalized', features[key]))
-
-  target_tensors = []
-  for key in desired_targets:
-    target_tensors.append(features.get(key + '_unnormalized', features[key]))
-
+  scalar_tensors = [
+      features.get(key + '_unnormalized', features[key])
+      for key in desired_scalars
+  ]
+  target_tensors = [
+      features.get(key + '_unnormalized', features[key])
+      for key in desired_targets
+  ]
   scalar_class = collections.namedtuple('_ScalarClass', desired_scalars)
   target_class = collections.namedtuple('_TargetClass', desired_targets)
 

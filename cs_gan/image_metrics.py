@@ -27,10 +27,9 @@ def get_image_metrics_for_samples(
 
   def sample_fn(arg):
     del arg
-    samples = generator(prior.sample(max_classifier_batch))
     # Samples must be in [-1, 1], as expected by TFGAN.
     # Resizing to appropriate size is done by TFGAN.
-    return samples
+    return generator(prior.sample(max_classifier_batch))
 
   fake_outputs = tfgan.eval.sample_and_run_inception(
       sample_fn,

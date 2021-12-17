@@ -205,9 +205,10 @@ def _downcast_ints(x):
 
 def _one_hot_atoms(atoms: tf.Tensor) -> tf.Tensor:
   vocab_sizes = features.get_atom_feature_dims()
-  one_hots = []
-  for i in range(atoms.shape[1]):
-    one_hots.append(tf.one_hot(atoms[:, i], vocab_sizes[i], dtype=tf.float32))
+  one_hots = [
+      tf.one_hot(atoms[:, i], vocab_sizes[i], dtype=tf.float32)
+      for i in range(atoms.shape[1])
+  ]
   return tf.concat(one_hots, axis=-1)
 
 
@@ -224,9 +225,10 @@ def _sample_one_hot_atoms(atoms: tf.Tensor) -> tf.Tensor:
 
 def _one_hot_bonds(bonds: tf.Tensor) -> tf.Tensor:
   vocab_sizes = features.get_bond_feature_dims()
-  one_hots = []
-  for i in range(bonds.shape[1]):
-    one_hots.append(tf.one_hot(bonds[:, i], vocab_sizes[i], dtype=tf.float32))
+  one_hots = [
+      tf.one_hot(bonds[:, i], vocab_sizes[i], dtype=tf.float32)
+      for i in range(bonds.shape[1])
+  ]
   return tf.concat(one_hots, axis=-1)
 
 

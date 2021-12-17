@@ -177,25 +177,22 @@ class IODINE(snt.AbstractModule):
 
     iterations["recons_loss"] = [tf.reduce_mean(re) for re in iterations["re"]]
 
-    total_rec_loss = sum([
+    total_rec_loss = sum(
         w * re
-        for w, re in zip(self.iter_loss_weights, iterations["recons_loss"])
-    ])
-    total_kl_loss = sum([
+        for w, re in zip(self.iter_loss_weights, iterations["recons_loss"]))
+    total_kl_loss = sum(
         w * tf.reduce_mean(tf.reduce_sum(kl, axis=1))
-        for w, kl in zip(self.iter_loss_weights, iterations["kl"])
-    ])
+        for w, kl in zip(self.iter_loss_weights, iterations["kl"]))
 
     total_loss = total_rec_loss + total_kl_loss
 
     scalars = {
         "loss/kl":
-            sum([
-                tf.reduce_mean(tf.reduce_sum(kl, axis=1))
-                for kl in iterations["kl"]
-            ]),
+        sum(
+            tf.reduce_mean(tf.reduce_sum(kl, axis=1))
+            for kl in iterations["kl"]),
         "loss/recons":
-            total_rec_loss,
+        total_rec_loss,
     }
 
     if self.factor_evaluator:
@@ -509,7 +506,7 @@ class IODINE(snt.AbstractModule):
         out_dist.log_prob(img)[..., tf.newaxis], "B, 1, H, W, 1")
 
     counterfactual_log_probs = []
-    for k in range(0, self.num_components):
+    for k in range(self.num_components):
       mask = tf.concat([out_params.mask[:, :k], out_params.mask[:, k + 1:]],
                        axis=1)
       pixel = tf.concat([out_params.pixel[:, :k], out_params.pixel[:, k + 1:]],
@@ -574,23 +571,22 @@ class IODINE(snt.AbstractModule):
     return final_inputs
 
   def _apply_preprocessing(self, name, val):
-    if name in self.preprocess:
-      if self._sg.matches(val, "B, K, _z"):
-        flat_val = tf.reshape(val, self._sg["B*K"] + [-1])
-      elif self._sg.matches(val, "B, 1, _z"):
-        flat_val = val[:, 0, :]
-      elif self._sg.matches(val, "B, K, H, W, _c"):
-        flat_val = tf.reshape(val, self._sg["B*K, H*W"] + [-1])
-      elif self._sg.matches(val, "B, 1, H, W, _c"):
-        flat_val = tf.reshape(val, self._sg["B, H*W"] + [-1])
-      else:
-        raise ValueError("Cannot handle shape {}".format(
-            val.get_shape().as_list()))
-      ln = self._layernorms[name]
-      norm_val = ln(flat_val)
-      return tf.reshape(norm_val, val.shape.as_list())
-    else:
+    if name not in self.preprocess:
       return val
+    if self._sg.matches(val, "B, K, _z"):
+      flat_val = tf.reshape(val, self._sg["B*K"] + [-1])
+    elif self._sg.matches(val, "B, 1, _z"):
+      flat_val = val[:, 0, :]
+    elif self._sg.matches(val, "B, K, H, W, _c"):
+      flat_val = tf.reshape(val, self._sg["B*K, H*W"] + [-1])
+    elif self._sg.matches(val, "B, 1, H, W, _c"):
+      flat_val = tf.reshape(val, self._sg["B, H*W"] + [-1])
+    else:
+      raise ValueError("Cannot handle shape {}".format(
+          val.get_shape().as_list()))
+    ln = self._layernorms[name]
+    norm_val = ln(flat_val)
+    return tf.reshape(norm_val, val.shape.as_list())
 
   def _get_coord_channels(self):
     if self.coord_type == "linear":
@@ -608,8 +604,7 @@ class IODINE(snt.AbstractModule):
       x_basis = tf.cos(valx * freqs[None, None, None, None, :, None])
       y_basis = tf.cos(valy * freqs[None, None, None, None, None, :])
       xy_basis = tf.reshape(x_basis * y_basis, self._sg["1, 1, H, W, F*F"])
-      coords = tf.tile(xy_basis, self._sg["B, 1, 1, 1, 1"])[..., 1:]
-      return coords
+      return tf.tile(xy_basis, self._sg["B, 1, 1, 1, 1"])[..., 1:]
     else:
       raise KeyError('Unknown coord_type: "{}"'.format(self.coord_type))
 

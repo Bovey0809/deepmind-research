@@ -248,7 +248,7 @@ class _StitchingDecoder(snt.AbstractModule):
     start_level = num_latents + 1
     num_levels = len(self._channels_per_block)
 
-    for level in range(start_level, num_levels, 1):
+    for level in range(start_level, num_levels):
       decoder_features = unet_utils.resize_up(decoder_features, scale=2)
       decoder_features = tf.concat([decoder_features,
                                     encoder_features[::-1][level]], axis=-1)
@@ -321,8 +321,7 @@ class HierarchicalProbUNet(snt.AbstractModule):
     if channels_per_block is None:
       channels_per_block = default_channels_per_block
     if down_channels_per_block is None:
-      down_channels_per_block =\
-        tuple([i / 2 for i in default_channels_per_block])
+      down_channels_per_block = tuple(i / 2 for i in default_channels_per_block)
     if initializers is None:
       initializers = {
           'w': tf.orthogonal_initializer(gain=1.0, seed=None),
@@ -405,9 +404,7 @@ class HierarchicalProbUNet(snt.AbstractModule):
     Returns: None
     """
     inputs = (seg, img)
-    if self._cache == inputs:
-      return
-    else:
+    if self._cache != inputs:
       self._q_sample = self._posterior(
           tf.concat([seg, img], axis=-1), mean=False)
       self._q_sample_mean = self._posterior(
@@ -419,7 +416,7 @@ class HierarchicalProbUNet(snt.AbstractModule):
       self._p_sample_z_q_mean = self._prior(
           img, z_q=self._q_sample_mean['used_latents'])
       self._cache = inputs
-      return
+    return
 
   def sample(self, img, mean=False, z_q=None):
     """Sample a segmentation from the prior, given an input image.
@@ -457,10 +454,7 @@ class HierarchicalProbUNet(snt.AbstractModule):
       A segmentation tensor of shape (b,h,w,num_classes).
     """
     self._build(seg, img)
-    if mean:
-      prior_out = self._p_sample_z_q_mean
-    else:
-      prior_out = self._p_sample_z_q
+    prior_out = self._p_sample_z_q_mean if mean else self._p_sample_z_q
     encoder_features = prior_out['encoder_features']
     decoder_features = prior_out['decoder_features']
     return self._f_comb(encoder_features=encoder_features,

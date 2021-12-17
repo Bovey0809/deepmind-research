@@ -64,7 +64,7 @@ def add_targets(ds, fields, add_history):
       out[key] = val[1:-1]
       if key in fields:
         if add_history:
-          out['prev|'+key] = val[0:-2]
+          out['prev|'+key] = val[:-2]
         out['target|'+key] = val[2:]
     return out
   return ds.map(fn, num_parallel_calls=8)

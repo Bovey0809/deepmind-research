@@ -138,9 +138,8 @@ class CS(object):
     step_vars = _get_and_check_variables(self._log_step_size_module)
 
     assert discriminator_loss is None
-    optimization_components = utils.OptimizationComponent(
+    return utils.OptimizationComponent(
         generator_loss, generator_vars + metric_vars + step_vars)
-    return optimization_components
 
 
 def _get_and_check_variables(module):

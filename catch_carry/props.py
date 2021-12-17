@@ -36,9 +36,10 @@ class Pedestal(composer.Entity):
 
   def after_compile(self, physics, unused_random_state):
     super(Pedestal, self).after_compile(physics, unused_random_state)
-    self._body_geom_ids = set(
+    self._body_geom_ids = {
         physics.bind(geom).element_id
-        for geom in self.mjcf_model.find_all('geom'))
+        for geom in self.mjcf_model.find_all('geom')
+    }
 
   @property
   def body_geom_ids(self):
@@ -76,9 +77,10 @@ class Bucket(composer.Entity):
 
   def after_compile(self, physics, unused_random_state):
     super(Bucket, self).after_compile(physics, unused_random_state)
-    self._body_geom_ids = set(
+    self._body_geom_ids = {
         physics.bind(geom).element_id
-        for geom in self.mjcf_model.find_all('geom'))
+        for geom in self.mjcf_model.find_all('geom')
+    }
 
   @property
   def body_geom_ids(self):

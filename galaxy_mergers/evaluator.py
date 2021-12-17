@@ -93,8 +93,7 @@ class GalaxyMergeClassifierEvaluator():
           })
       parsed_example['image'] = tf.sparse.to_dense(
           parsed_example['image'], default_value=0)
-      dataset_row = parsed_example
-      return dataset_row
+      return parsed_example
 
     def build_eval_pipeline(_):
       """Generate the processed input evaluation data."""
@@ -207,7 +206,7 @@ def run_model_on_dataset(evaluator, dataset, config, n_batches=16):
 
     for scalar_metric in scalar_metrics:
       v = scalar_metrics[scalar_metric]
-      val = v if isinstance(v, int) or isinstance(v, float) else v.numpy()
+      val = v if isinstance(v, (int, float)) else v.numpy()
       scalar_metrics_to_log[scalar_metric].append(val)
 
     for vector_metric in vector_metrics:

@@ -94,7 +94,7 @@ class CurvatureEstimator(utils.Stateful):
     # Figure out the mapping from layer
     self.layer_tag_to_block_cls = curvature_blocks.copy_default_tag_to_block()
     if layer_tag_to_block_cls is None:
-      layer_tag_to_block_cls = dict()
+      layer_tag_to_block_cls = {}
     layer_tag_to_block_cls = dict(**layer_tag_to_block_cls)
     self.layer_tag_to_block_cls.update(layer_tag_to_block_cls)
 
@@ -103,7 +103,7 @@ class CurvatureEstimator(utils.Stateful):
     self._jaxpr = jax.make_jaxpr(self.tagged_func)(*func_args).jaxpr
     self._layer_tags, self._loss_tags = tracer.extract_tags(self._jaxpr)
     self.blocks = collections.OrderedDict()
-    counters = dict()
+    counters = {}
     for eqn in self._layer_tags:
       cls = self.layer_tag_to_block_cls[eqn.primitive.name]
       c = counters.get(cls.__name__, 0)
@@ -143,7 +143,7 @@ class CurvatureEstimator(utils.Stateful):
     """Reverses the function self.vectors_to_blocks."""
     in_vars = jax.tree_unflatten(self._in_tree, self._jaxpr.invars)
     params_vars = in_vars[self.params_index]
-    assigned_dict = dict()
+    assigned_dict = {}
     for eqn, block_values in zip(self._layer_tags, per_block_vectors):
       if eqn.primitive.name == "generic_tag":
         block_params = eqn.invars
@@ -334,7 +334,6 @@ class CurvatureEstimator(utils.Stateful):
                                               pmap_axis_name)
     if state is None:
       return None
-    else:
-      state = self.pop_state()
-      self.set_state(old_state)
-      return state
+    state = self.pop_state()
+    self.set_state(old_state)
+    return state

@@ -76,10 +76,9 @@ class LagrangeMultiplier(snt.AbstractModule):
       maximizing w.r.t. the Lagrande multipliers, hence enforcing the
       constraints.
     """
-    lagmul = snt.get_lagrange_multiplier(
+    return snt.get_lagrange_multiplier(
         shape=ma_constraint.shape, rate=self._rate,
         initializer=np.ones(ma_constraint.shape))
-    return lagmul
 
 
 def _sample_gumbel(shape, eps=1e-20):

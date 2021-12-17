@@ -224,8 +224,7 @@ class Experiment(experiment.AbstractExperiment):
 
   def _one_hot(self, value):
     """One-hot encoding potentially over a sequence of labels."""
-    y = jax.nn.one_hot(value, self.config.num_classes)
-    return y
+    return jax.nn.one_hot(value, self.config.num_classes)
 
   def _loss_fn(self, params, state, inputs, rng):
     logits, state = self.net.apply(params, state, rng, inputs, is_training=True)

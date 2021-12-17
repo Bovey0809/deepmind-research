@@ -157,14 +157,10 @@ def load(split: Split,
 
 def _to_tfds_split(split: Split) -> tfds.Split:
   """Returns the TFDS split appropriately sharded."""
-  # NOTE: Imagenet did not release labels for the test split used in the
-  # competition, we consider the VALID split the TEST split and reserve
-  # 10k images from TRAIN for VALID.
   if split in (Split.TRAIN, Split.TRAIN_AND_VALID, Split.VALID):
     return tfds.Split.TRAIN
-  else:
-    assert split == Split.TEST
-    return tfds.Split.VALIDATION
+  assert split == Split.TEST
+  return tfds.Split.VALIDATION
 
 
 def _shard(split: Split, shard_index: int, num_shards: int) -> Tuple[int, int]:
@@ -229,8 +225,7 @@ def _decode_and_random_crop(image_bytes: tf.Tensor) -> tf.Tensor:
                                dtype=tf.int32)
 
   crop_window = tf.stack([offset_h, offset_w, h, w])
-  image = tf.io.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
-  return image
+  return tf.io.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
 
 
 def transpose_images(batch: Batch):
@@ -264,5 +259,4 @@ def _decode_and_center_crop(
       offset_height, offset_width, padded_center_crop_size,
       padded_center_crop_size
   ])
-  image = tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
-  return image
+  return tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
